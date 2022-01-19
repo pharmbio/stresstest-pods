@@ -11,7 +11,7 @@ def runCommandThreaded(stress_cmd):
 ## Main entry
 ################
 
-# Command to execute (e.g. execute a sqlite3 command in each pod via kubectl exec, dont use -it on exec - it messes up terminal)
+# Shell(Bash) command to execute (e.g. execute a sqlite3 command in each pod via kubectl exec, dont use -it on exec - it messes up terminal)
 stress_cmd_template = '''
 time -p kubectl exec -n guest {pod_name} -- \
         sqlite3 /scratch-shared/chembl_23_sqlite/chembl_23.db "SELECT td.PREF_NAME, COUNT(a.STANDARD_VALUE)
