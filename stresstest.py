@@ -11,13 +11,6 @@ def runCommandThreaded(stress_cmd):
 ## Main entry
 ################
 
-# List/filter pod names where commands will get executed
-list_cmd = 'kubectl get po -n guest --no-headers -o custom-columns=":metadata.name" | grep stresstest'
-proc = subprocess.run(list_cmd, capture_output=True, shell=True)
-pod_names = proc.stdout.decode()
-
-print("pod_names:" + pod_names)
-
 # Command to execute (e.g. execute a sqlite3 command in each pod via kubectl exec, dont use -it on exec - it messes up terminal)
 stress_cmd_template = '''
 time -p kubectl exec -n guest {pod_name} -- \
@@ -34,6 +27,13 @@ time -p kubectl exec -n guest {pod_name} -- \
                                                                   LIMIT 3"
 '''
 
+# List/filter pod names where commands will get executed
+list_cmd = 'kubectl get po -n guest --no-headers -o custom-columns=":metadata.name" | grep stresstest'
+proc = subprocess.run(list_cmd, capture_output=True, shell=True)
+pod_names = proc.stdout.decode()
+
+print("pod_names:" + pod_names)
+
 # Execute command for each pod in list of podnames (each in a separate thread)
 threads = []
 for pod_name in pod_names.split():
@@ -41,7 +41,6 @@ for pod_name in pod_names.split():
     th = threading.Thread(target=runCommandThreaded, args=(stress_cmd,))
     th.start()
     threads.append(th)
-
 
 # synchronize threads
 for t in threads:
